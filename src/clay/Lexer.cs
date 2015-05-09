@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace clay
 {
-    static class Lexer
-    {
+    static class Lexer {
+        private const char QuotationMark = '\'';
+
         public static IEnumerable<IEnumerable<string>> Lex(StreamReader code) {
             var line = "";
             for (; !code.EndOfStream; line += (char) code.Read()) {
@@ -22,9 +23,11 @@ namespace clay
         }
 
         private static IEnumerable<string> SplitTrimMultipleSpaces(string code) {
+            var inquotes = false;
             var fragment = "";
             foreach (var @char in code) {
-                if (@char != ' ') { //we don't want to add spaces to our fragment, since we want to split on spaces
+                if (@char != ' ' || inquotes) { //we don't want to add spaces to our fragment, since we want to split on spaces
+                    if (@char == QuotationMark) { inquotes ^= true; continue; }
                     fragment += @char;
                 } else {
                     if (fragment == "") { continue; } //when we encounter two consecutive spaces we just omit them all together
