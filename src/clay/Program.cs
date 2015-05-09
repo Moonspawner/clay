@@ -17,6 +17,16 @@ and laugh beneath a brilliantly blue sky.")));
 
             var test = Lexer.Lex(stream).Select(t => t.ToArray()).ToArray();
 
+            foreach (var befehl in test)
+            {
+                switch(befehl)
+                {
+                    case "tell":
+                        ;
+                    break;
+                }
+            }
+
             Console.ReadLine();
         }
     }
