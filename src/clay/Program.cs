@@ -13,17 +13,16 @@ namespace clay
             var stream = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(@"I could only take your hand
 and lead you to the crossing road where we first met,
 we’d take a skip together like the good old days
-and laugh beneath a brilliantly blue sky.")));
+and laugh beneath a brilliantly blue sky.
 
-            var test = Lexer.Lex(stream).Select(t => t.ToArray()).ToArray();
+tell testtesttest")));
 
-            foreach (var befehl in test)
-            {
-                switch(befehl)
+            foreach (var lineArray in Lexer.Lex(stream).Select(line => line.ToArray())) {
+                switch(lineArray[0])
                 {
                     case "tell":
-                        ;
-                    break;
+                        Console.Write(lineArray[1]);
+                        break;
                 }
             }
 
