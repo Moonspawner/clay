@@ -10,11 +10,12 @@ namespace clay
     class Program
     {
         static void Main(string[] args) {
-            var stream = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes("test1 test2  test3   ")));
+            var stream = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(@"I could only take your hand
+and lead you to the crossing road where we first met,
+we’d take a skip together like the good old days
+and laugh beneath a brilliantly blue sky.")));
 
-            foreach (var token in Lexer.Lex(stream)) {
-                Console.WriteLine("-{0}-", token);
-            }
+            var test = Lexer.Lex(stream).Select(t => t.ToArray()).ToArray();
 
             Console.ReadLine();
         }
