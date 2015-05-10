@@ -14,20 +14,24 @@ namespace clay
 
         static void Main(string[] args) {
             var stream = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(@"
-tell 'fibonacci sequence' $newline
-set $old 1
-set $current 1
-set $new $current
-tell $old $newline
-tell $current $newline
-marker repeat
-set $new $current
-+ $new $old
-tell $new $newline
-set $old $current
-set $current $new
-sleep 350
-jump repeat
+tell 'primes' $newline
+set $prime 1
+marker nextprime
++ $prime 1
+set $tad $prime
+root $tad
++ $tad 1
+marker test
+- $tad 1
+xiflt $tad 2
+tell $prime $newline
+xiflt $tad 2
+jump nextprime
+set $remainder $prime
+% $remainder $tad
+xifzero $remainder
+jump nextprime
+jump test
 ".Replace("\r", ""))));
 
             _vars = new Dictionary<string, string> {{"$newline", "\n\r"}};
@@ -88,6 +92,26 @@ jump repeat
 
                         case "sleep":
                             Thread.Sleep(int.Parse(tokens[1]));
+                            break;
+                            
+                        case "xifone":
+                            if (Resolve(tokens[1]) != "1") { index ++; }
+                            break;
+
+                        case "xifzero":
+                            if (Resolve(tokens[1]) != "0") { index++; }
+                            break;
+
+                        case "xiflt":
+                            if (int.Parse(Resolve(tokens[1])) >= int.Parse(Resolve(tokens[2]))) { index++; }
+                            break;
+
+                        case "root":
+                            _vars[tokens[1]] = Math.Floor(Math.Sqrt(int.Parse(Resolve(tokens[1])))).ToString(); //TODO: add biginteger support
+                            break;
+
+                        case "%":
+                            _vars[tokens[1]] = (BigInteger.Parse(Resolve(tokens[1])) % BigInteger.Parse(Resolve(tokens[2]))).ToString();
                             break;
                     }
                 }
