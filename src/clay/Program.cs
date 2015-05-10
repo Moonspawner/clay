@@ -38,8 +38,8 @@ jump test
             _jumps = new Dictionary<string, int>();
 
             var lines = Lexer.Lex(stream).ToArray();
-            for (var index = 0; index < lines.Length; index++) {
-                var tokens = lines[index].ToArray();
+            for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++) {
+                var tokens = lines[lineNumber].ToArray();
 
                 if (tokens.Any()) {
                     switch (tokens[0]) {
@@ -83,11 +83,11 @@ jump test
                             break;
 
                         case "marker":
-                            _jumps[Resolve(tokens[1])] = index;
+                            _jumps[Resolve(tokens[1])] = lineNumber;
                             break;
 
                         case "jump":
-                            index = _jumps[Resolve(tokens[1])];
+                            lineNumber = _jumps[Resolve(tokens[1])];
                             break;
 
                         case "sleep":
@@ -95,15 +95,15 @@ jump test
                             break;
                             
                         case "xifone":
-                            if (Resolve(tokens[1]) != "1") { index ++; }
+                            if (Resolve(tokens[1]) != "1") { lineNumber ++; }
                             break;
 
                         case "xifzero":
-                            if (Resolve(tokens[1]) != "0") { index++; }
+                            if (Resolve(tokens[1]) != "0") { lineNumber++; }
                             break;
 
                         case "xiflt":
-                            if (int.Parse(Resolve(tokens[1])) >= int.Parse(Resolve(tokens[2]))) { index++; }
+                            if (int.Parse(Resolve(tokens[1])) >= int.Parse(Resolve(tokens[2]))) { lineNumber++; }
                             break;
 
                         case "root":
