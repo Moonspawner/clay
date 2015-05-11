@@ -1,37 +1,65 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 
 namespace clay
 {
     static class Lexer {
         private const char QuotationMark = '\'';
 
-        public static IEnumerable<IEnumerable<string>> Lex(StreamReader code) {
+        public static IEnumerable<IEnumerable<object>> Lex(StreamReader code) {
             var line = "";
-            for (; !code.EndOfStream; line += (char) code.Read()) {
-                if (code.Peek() == '\n') {
-                    yield return SplitTrimMultipleSpaces(line);
-                    line = "";
-                    code.Read();
+            for (;!code.EndOfStream;) {
+                switch (code.Peek()) {
+                    case '\n':
+                    case '\r':
+                        code.Read();
+                        if (line.Trim(" \n\r\t".ToCharArray()) != "") { yield return SplitTrimMultipleSpaces(line); }
+                        line = "";
+                        break;
+                    default:
+                        line += (char)code.Read();
+                        break;
                 }
             }
             if (line != "") { yield return SplitTrimMultipleSpaces(line); }
         }
 
-        private static IEnumerable<string> SplitTrimMultipleSpaces(string code) {
-            var inquotes = false;
+        private enum FragmentType {
+            @String,
+            @Integer
+        }
+
+        //TODO: I really want to rewrite this in a functional matter
+        private static IEnumerable<object> SplitTrimMultipleSpaces(string code) {
+            var i = 0;
+
             var fragment = "";
-            foreach (var @char in code) {
-                if (@char != ' ' || inquotes) { //we don't want to add spaces to our fragment, since we want to split on spaces
-                    if (@char == QuotationMark) { inquotes ^= true; continue; }
-                    fragment += @char;
-                } else {
-                    if (fragment == "") { continue; } //when we encounter two consecutive spaces we just omit them all together
-                    yield return fragment;
-                    fragment = ""; 
+            var inQuotes = false;
+
+            while (i < code.Length) {
+                while (i < code.Length && (code[i] != ' ' || inQuotes)) {
+                    inQuotes ^= code[i] == QuotationMark;
+                    fragment += code[i++];
                 }
+
+                if (fragment.Any()) {
+                    if (fragment.Any(c => !"0123456789".Contains(c))) {
+                        if (fragment.Length > 1 && fragment.First() == QuotationMark && fragment.Last() == QuotationMark) { //TODO:haven't decided yet what to do when there's only one quotation mark
+                            yield return fragment.Substring(1, fragment.Length - 2);
+                        } else {
+                            yield return fragment;
+                        }
+                    } else {
+                        yield return BigInteger.Parse(fragment);
+                    }
+                }
+
+                i++; //progress
+                fragment = "";
             }
-            if(fragment != "") { yield return fragment; } //I'd love to have an simple and clean way to tell if we were in the last iteration of the foreach-loop
         }
     }
 }
