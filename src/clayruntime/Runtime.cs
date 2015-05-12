@@ -1,16 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Security;
 using System.Text;
-using System.Threading;
 
 namespace clay {
-    class Runtime {
+    public class Runtime {
         private static Dictionary<string, object> _vars;
         private static Dictionary<string, int> _jumps;
         private int _lineNumber;
